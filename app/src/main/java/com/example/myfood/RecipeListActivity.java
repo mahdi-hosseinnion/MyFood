@@ -1,38 +1,36 @@
 package com.example.myfood;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
-import com.example.myfood.Models.Recipe;
+
+
 import com.example.myfood.requests.RecipeApi;
 import com.example.myfood.requests.ServiceGenerator;
 import com.example.myfood.requests.responses.RecipeResponse;
-import com.example.myfood.requests.responses.RecipeSearchResponse;
+import com.example.myfood.viewmodels.RecipeListViewModel;
+
 
 import java.io.IOException;
 
 public class RecipeListActivity extends BasicActivity {
     //var
     private static final String TAG = "RecipeListActivity";
+    //objects
+    RecipeListViewModel recipeListViewModel;
 
     //ui component
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
-        findViewById(R.id.btn_test).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                testRetrofitRequests();
-            }
-        });
+        recipeListViewModel= ViewModelProviders.of(this).get(RecipeListViewModel.class);
+
     }
 
     private void testRetrofitRequests() {
@@ -66,12 +64,12 @@ public class RecipeListActivity extends BasicActivity {
         responseCall.enqueue(new Callback<RecipeResponse>() {
             @Override
             public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
-                if (response.code()==200){
+                if (response.code() == 200) {
 
-                    Log.d(TAG, "onResponse: "+ response.body().getRecipe().toString());
-                }else{
+                    Log.d(TAG, "onResponse: " + response.body().getRecipe().toString());
+                } else {
                     try {
-                        Log.e(TAG, "onResponse: "+response.errorBody().string() );
+                        Log.e(TAG, "onResponse: " + response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
