@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveData;
 
 public class RecipeRepository {
     private static RecipeRepository instance;
-    private RecipeApiClient recipeApiClient;
+    private RecipeApiClient RecipeApiClient;
 
     public static RecipeRepository getInstance() {
         if (instance == null) {
@@ -19,10 +19,15 @@ public class RecipeRepository {
     }
 
     private RecipeRepository() {
-        recipeApiClient = RecipeApiClient.getInstance();
+        RecipeApiClient = RecipeApiClient.getInstance();
     }
 
     public LiveData<List<Recipe>> getRecipes() {
-        return recipeApiClient.getRecipes();
+        return RecipeApiClient.getRecipes();
+    }
+    public void searchRecipeApi(String query,int pageNO){
+        if (pageNO<1)
+            pageNO=1;
+        RecipeApiClient.searchRecipeApi(query,pageNO);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.myfood;
 
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -7,9 +8,10 @@ import retrofit2.Response;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 
-
+import com.example.myfood.Models.Recipe;
 import com.example.myfood.requests.RecipeApi;
 import com.example.myfood.requests.ServiceGenerator;
 import com.example.myfood.requests.responses.RecipeResponse;
@@ -17,6 +19,7 @@ import com.example.myfood.viewmodels.RecipeListViewModel;
 
 
 import java.io.IOException;
+import java.util.List;
 
 public class RecipeListActivity extends BasicActivity {
     //var
@@ -30,56 +33,26 @@ public class RecipeListActivity extends BasicActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
         recipeListViewModel= ViewModelProviders.of(this).get(RecipeListViewModel.class);
-
-    }
-
-    private void testRetrofitRequests() {
-        final RecipeApi recipeApi = ServiceGenerator.getRecipeApi();
-//        Call<RecipeSearchResponse> responseCall =
-//                recipeApi.searchRecipe("chicken","1");
-//        responseCall.enqueue(new Callback<RecipeSearchResponse>() {
-//            @Override
-//            public void onResponse(Call<RecipeSearchResponse> call, Response<RecipeSearchResponse> response) {
-//                if (response.code() == 200) {
-//                    for (Recipe recipe : response.body().getRecipes()) {
-//                        Log.d(TAG, "onResponse: " + recipe.toString());
-//                    }
-//                } else {
-//
-//                    try {
-//                        Log.e(TAG, "onResponse: " + response.errorBody().string());
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<RecipeSearchResponse> call, Throwable t) {
-//                Log.e(TAG, "onFailure: call failed");
-//            }
-//        });
-        Call<RecipeResponse> responseCall =
-                recipeApi.getRecipe("39468");
-        responseCall.enqueue(new Callback<RecipeResponse>() {
+        subscribeToLiveData();
+        findViewById(R.id.btn_test).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
-                if (response.code() == 200) {
-
-                    Log.d(TAG, "onResponse: " + response.body().getRecipe().toString());
-                } else {
-                    try {
-                        Log.e(TAG, "onResponse: " + response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RecipeResponse> call, Throwable t) {
-                Log.e(TAG, "onFailure: call failed");
+            public void onClick(View v) {
+                testRetrofitRequests();
             }
         });
+
+    }
+    private void subscribeToLiveData(){
+        recipeListViewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
+            @Override
+            public void onChanged(List<Recipe> recipes) {
+                for(Recipe recipe:recipes){
+                    Log.d(TAG, "onChanged: "+recipe.getTitle());
+                }
+            }
+        });
+    }
+    private void testRetrofitRequests() {
+        recipeListViewModel.searchRecipeApi("chicken",1);
     }
 }
