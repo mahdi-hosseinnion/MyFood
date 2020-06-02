@@ -1,6 +1,7 @@
 package com.example.myfood.viewmodels;
 
 import com.example.myfood.Models.Recipe;
+import com.example.myfood.repositories.RecipeRepository;
 
 import java.util.List;
 
@@ -9,11 +10,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class RecipeListViewModel extends ViewModel {
-    public RecipeListViewModel() {
-    }
-    private MutableLiveData<List<Recipe>> mRecipes=new MutableLiveData<>();
 
+    private RecipeRepository mRecipesRepository;
+    public RecipeListViewModel() {
+        mRecipesRepository=RecipeRepository.getInstance();
+    }
     public LiveData<List<Recipe>> getRecipes() {
-        return mRecipes;
+        return mRecipesRepository.getRecipes();
     }
 }
