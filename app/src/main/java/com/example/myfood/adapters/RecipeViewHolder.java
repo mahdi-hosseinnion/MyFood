@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
      TextView txt_title,txt_publisher,txt_social_rank;
      ImageView recipe_image;
-     OnRecipeListener onRecipeListener;
+     private OnRecipeListener onRecipeListener;
     public RecipeViewHolder(@NonNull View itemView, OnRecipeListener onRecipeListener) {
 
         super(itemView);

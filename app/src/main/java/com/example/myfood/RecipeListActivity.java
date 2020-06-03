@@ -2,6 +2,8 @@ package com.example.myfood;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -12,6 +14,8 @@ import android.view.View;
 
 
 import com.example.myfood.Models.Recipe;
+import com.example.myfood.adapters.OnRecipeListener;
+import com.example.myfood.adapters.RecipeRecyclerAdapter;
 import com.example.myfood.requests.RecipeApi;
 import com.example.myfood.requests.ServiceGenerator;
 import com.example.myfood.requests.responses.RecipeResponse;
@@ -21,38 +25,61 @@ import com.example.myfood.viewmodels.RecipeListViewModel;
 import java.io.IOException;
 import java.util.List;
 
-public class RecipeListActivity extends BasicActivity {
-    //var
+public class RecipeListActivity extends BasicActivity implements
+        OnRecipeListener {
     private static final String TAG = "RecipeListActivity";
-    //objects
+    //var
     RecipeListViewModel recipeListViewModel;
-
+    RecipeRecyclerAdapter mRecipeRecyclerAdapter;
     //ui component
+    RecyclerView recyclerView_recipe;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
-        recipeListViewModel= ViewModelProviders.of(this).get(RecipeListViewModel.class);
+        findViews();
+        init();
         subscribeToLiveData();
-        findViewById(R.id.btn_test).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                testRetrofitRequests();
-            }
-        });
+        testRetrofitRequests();
 
     }
-    private void subscribeToLiveData(){
+
+    private void findViews() {
+        recyclerView_recipe = findViewById(R.id.recyclerView_recipe);
+    }
+
+    private void init() {
+        recipeListViewModel = ViewModelProviders.of(this).get(RecipeListViewModel.class);
+        initRecycler();
+    }
+
+    private void initRecycler() {
+        mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this);
+        recyclerView_recipe.setAdapter(mRecipeRecyclerAdapter);
+        recyclerView_recipe.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    private void subscribeToLiveData() {
         recipeListViewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
             @Override
             public void onChanged(List<Recipe> recipes) {
-                for(Recipe recipe:recipes){
-                    Log.d(TAG, "onChanged: "+recipe.getTitle());
-                }
+                mRecipeRecyclerAdapter.setRecipes(recipes);
             }
         });
     }
+
     private void testRetrofitRequests() {
-        recipeListViewModel.searchRecipeApi("chicken",1);
+        recipeListViewModel.searchRecipeApi("chicken", 1);
+    }
+
+    @Override
+    public void OnRecipeClick(int position) {
+        Log.d(TAG, "OnRecipeClick: " + position + " clicked");
+    }
+
+    @Override
+    public void OnCategoryClick(String category) {
+        Log.d(TAG, "OnCategoryClick: " + category + " clicked");
     }
 }

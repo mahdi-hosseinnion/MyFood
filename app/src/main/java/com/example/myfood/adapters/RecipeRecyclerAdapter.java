@@ -18,8 +18,7 @@ public class RecipeRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private List<Recipe> mRecipes;
     private OnRecipeListener onRecipeListener;
 
-    public RecipeRecyclerAdapter(List<Recipe> mRecipes, OnRecipeListener onRecipeListener) {
-        this.mRecipes = mRecipes;
+    public RecipeRecyclerAdapter( OnRecipeListener onRecipeListener) {
         this.onRecipeListener = onRecipeListener;
     }
 
@@ -37,7 +36,6 @@ public class RecipeRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         ((RecipeViewHolder)holder).txt_title.setText(recipe.getTitle());
         ((RecipeViewHolder)holder).txt_publisher.setText(recipe.getPublisher());
         ((RecipeViewHolder)holder).txt_social_rank.setText(String.valueOf(Math.round(recipe.getSocial_rank())));
-
         //setImage
         RequestOptions RQ = new RequestOptions()
                 .placeholder(R.drawable.ic_launcher_background);
