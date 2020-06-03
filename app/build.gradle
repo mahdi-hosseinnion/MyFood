@@ -26,6 +26,7 @@ android {
 dependencies {
     def retrofitVersion="2.6.0"
     def lifecycle_version = "2.2.0"
+    def glide_version = "4.11.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -45,5 +46,10 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
     //cardVeiw
     implementation "androidx.cardview:cardview:1.0.0"
+    //recyclerview
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    //glide
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
 
 }
