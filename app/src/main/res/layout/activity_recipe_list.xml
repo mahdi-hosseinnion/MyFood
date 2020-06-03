@@ -12,8 +12,15 @@
 
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_height"
-            app:layout_scrollFlags="scroll|enterAlways" />
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|enterAlways" >
+            <SearchView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/toolbar_height"
+                android:queryHint="chicken ..."
+                android:id="@+id/searchView_main"/>
+
+        </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView

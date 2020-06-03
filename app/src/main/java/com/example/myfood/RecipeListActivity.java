@@ -11,6 +11,7 @@ import retrofit2.Response;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.SearchView;
 
 
 import com.example.myfood.Models.Recipe;
@@ -33,6 +34,7 @@ public class RecipeListActivity extends BasicActivity implements
     RecipeRecyclerAdapter mRecipeRecyclerAdapter;
     //ui component
     RecyclerView recyclerView_recipe;
+    SearchView searchView_main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,19 +43,34 @@ public class RecipeListActivity extends BasicActivity implements
         findViews();
         init();
         subscribeToLiveData();
-        testRetrofitRequests();
+
 
     }
 
     private void findViews() {
         recyclerView_recipe = findViewById(R.id.recyclerView_recipe);
+        searchView_main = findViewById(R.id.searchView_main);
     }
 
     private void init() {
         recipeListViewModel = ViewModelProviders.of(this).get(RecipeListViewModel.class);
         initRecycler();
+        initSearchView();
     }
+    private void initSearchView(){
+        searchView_main.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                recipeListViewModel.searchRecipeApi(query, 1);
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
     private void initRecycler() {
         mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this);
         recyclerView_recipe.setAdapter(mRecipeRecyclerAdapter);
@@ -69,9 +86,7 @@ public class RecipeListActivity extends BasicActivity implements
         });
     }
 
-    private void testRetrofitRequests() {
-        recipeListViewModel.searchRecipeApi("chicken", 1);
-    }
+
 
     @Override
     public void OnRecipeClick(int position) {
