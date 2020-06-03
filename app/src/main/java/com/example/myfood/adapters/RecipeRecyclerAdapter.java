@@ -39,7 +39,8 @@ public class RecipeRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         ((RecipeViewHolder)holder).txt_social_rank.setText(String.valueOf(Math.round(recipe.getSocial_rank())));
 
         //setImage
-        RequestOptions RQ = new RequestOptions().placeholder(R.drawable.ic_launcher_background);
+        RequestOptions RQ = new RequestOptions()
+                .placeholder(R.drawable.ic_launcher_background);
         Glide.with(holder.itemView.getContext())
                 .setDefaultRequestOptions(RQ)
                 .load(recipe.getImage_url())
