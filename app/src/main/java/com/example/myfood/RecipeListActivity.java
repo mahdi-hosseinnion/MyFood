@@ -20,6 +20,7 @@ import com.example.myfood.adapters.RecipeRecyclerAdapter;
 import com.example.myfood.requests.RecipeApi;
 import com.example.myfood.requests.ServiceGenerator;
 import com.example.myfood.requests.responses.RecipeResponse;
+import com.example.myfood.util.VerticalSpacingDecorator;
 import com.example.myfood.viewmodels.RecipeListViewModel;
 
 
@@ -74,6 +75,7 @@ public class RecipeListActivity extends BasicActivity implements
     }
     private void initRecycler() {
         mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this);
+        recyclerView_recipe.addItemDecoration(new VerticalSpacingDecorator(30));
         recyclerView_recipe.setAdapter(mRecipeRecyclerAdapter);
         recyclerView_recipe.setLayoutManager(new LinearLayoutManager(this));
     }
