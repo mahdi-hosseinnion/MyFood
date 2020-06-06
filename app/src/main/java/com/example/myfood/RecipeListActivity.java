@@ -44,10 +44,17 @@ public class RecipeListActivity extends BasicActivity implements
         findViews();
         init();
         subscribeToLiveData();
-
+        Log.d(TAG, "onCreate: sssssssssssssssssssssstaaaaaaaaaaaaarted");
+        if(!recipeListViewModel.isViewingRecipes()){
+            // display search categories
+            displaySearchCategories();
+        }
 
     }
-
+    private void displaySearchCategories(){
+        recipeListViewModel.setIsViewingRecipes(false);
+        mRecipeRecyclerAdapter.displaySearchCategories();
+    }
     private void findViews() {
         recyclerView_recipe = findViewById(R.id.recyclerView_recipe);
         searchView_main = findViewById(R.id.searchView_main);
@@ -98,6 +105,7 @@ public class RecipeListActivity extends BasicActivity implements
 
     @Override
     public void OnCategoryClick(String category) {
-        Log.d(TAG, "OnCategoryClick: " + category + " clicked");
+        mRecipeRecyclerAdapter.displayLoading();
+        recipeListViewModel.searchRecipeApi(category, 1);
     }
 }

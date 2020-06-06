@@ -10,15 +10,23 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class RecipeListViewModel extends ViewModel {
-
+    private boolean mIsViewingRecipes;
     private RecipeRepository mRecipesRepository;
     public RecipeListViewModel() {
+
         mRecipesRepository=RecipeRepository.getInstance();
     }
     public LiveData<List<Recipe>> getRecipes() {
         return mRecipesRepository.getRecipes();
     }
     public void searchRecipeApi(String query,int pageNO){
+        mIsViewingRecipes = true;
         mRecipesRepository.searchRecipeApi(query,pageNO);
+    }
+    public boolean isViewingRecipes(){
+        return mIsViewingRecipes;
+    }
+    public void setIsViewingRecipes(boolean isViewingRecipes){
+        mIsViewingRecipes = isViewingRecipes;
     }
 }
