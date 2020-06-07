@@ -11,29 +11,52 @@ import androidx.lifecycle.ViewModel;
 
 public class RecipeListViewModel extends ViewModel {
     private boolean mIsViewingRecipes;
+    private boolean mIsPerformingQuery;
     private RecipeRepository mRecipesRepository;
-    public RecipeListViewModel() {
 
-        mRecipesRepository=RecipeRepository.getInstance();
+    public RecipeListViewModel() {
+        mIsPerformingQuery = false;
+        mRecipesRepository = RecipeRepository.getInstance();
     }
+
     public LiveData<List<Recipe>> getRecipes() {
         return mRecipesRepository.getRecipes();
     }
-    public void searchRecipeApi(String query,int pageNO){
+
+    public void searchRecipeApi(String query, int pageNO) {
         mIsViewingRecipes = true;
-        mRecipesRepository.searchRecipeApi(query,pageNO);
+        mIsPerformingQuery = true;
+        mRecipesRepository.searchRecipeApi(query, pageNO);
     }
-    public boolean isViewingRecipes(){
-        return mIsViewingRecipes;
-    }
-    public void setIsViewingRecipes(boolean isViewingRecipes){
-        mIsViewingRecipes = isViewingRecipes;
-    }
-    public boolean onBackPressed(){
-        if (isViewingRecipes()){
-            mIsViewingRecipes=false;
+
+
+    public boolean onBackPressed() {
+        if (isPerformingQuery()) {
+            //cancel Request
+            mIsPerformingQuery=false;
+            mRecipesRepository.cancelRequest();
+        }
+        if (isViewingRecipes()) {
+            mIsViewingRecipes = false;
             return false;
         }
         return true;
+    }
+
+
+    public boolean isPerformingQuery() {
+        return mIsPerformingQuery;
+    }
+
+    public void setIsPerformingQuery(boolean mIsPerformingQuery) {
+        this.mIsPerformingQuery = mIsPerformingQuery;
+    }
+
+    public boolean isViewingRecipes() {
+        return mIsViewingRecipes;
+    }
+
+    public void setIsViewingRecipes(boolean isViewingRecipes) {
+        mIsViewingRecipes = isViewingRecipes;
     }
 }

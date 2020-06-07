@@ -37,16 +37,18 @@ public class RecipeListActivity extends BasicActivity implements
         init();
         subscribeToLiveData();
         Log.d(TAG, "onCreate: sssssssssssssssssssssstaaaaaaaaaaaaarted");
-        if(!mRecipeListViewModel.isViewingRecipes()){
+        if (!mRecipeListViewModel.isViewingRecipes()) {
             // display search categories
             displaySearchCategories();
         }
 
     }
-    private void displaySearchCategories(){
+
+    private void displaySearchCategories() {
         mRecipeListViewModel.setIsViewingRecipes(false);
         mRecipeRecyclerAdapter.displaySearchCategories();
     }
+
     private void findViews() {
         mRecyclerView_recipe = findViewById(R.id.recyclerView_recipe);
         mSearchView_main = findViewById(R.id.searchView_main);
@@ -57,21 +59,7 @@ public class RecipeListActivity extends BasicActivity implements
         initRecycler();
         initSearchView();
     }
-    private void initSearchView(){
-        mSearchView_main.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mRecipeRecyclerAdapter.displayLoading();
-                mRecipeListViewModel.searchRecipeApi(query, 1);
-                return false;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-    }
     private void initRecycler() {
         mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this);
         mRecyclerView_recipe.addItemDecoration(new VerticalSpacingDecorator(30));
@@ -83,8 +71,27 @@ public class RecipeListActivity extends BasicActivity implements
         mRecipeListViewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
             @Override
             public void onChanged(List<Recipe> recipes) {
-                if (recipes!=null&&mRecipeListViewModel.isViewingRecipes())
-                mRecipeRecyclerAdapter.setRecipes(recipes);
+                if (recipes != null && mRecipeListViewModel.isViewingRecipes()){
+                    mRecipeListViewModel.setIsPerformingQuery(false);
+                    mRecipeRecyclerAdapter.setRecipes(recipes);
+                }
+            }
+        });
+    }
+
+    private void initSearchView() {
+        mSearchView_main.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mSearchView_main.clearFocus();
+                mRecipeRecyclerAdapter.displayLoading();
+                mRecipeListViewModel.searchRecipeApi(query, 1);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
             }
         });
     }
@@ -97,14 +104,16 @@ public class RecipeListActivity extends BasicActivity implements
 
     @Override
     public void OnCategoryClick(String category) {
+        mSearchView_main.clearFocus();
         mRecipeRecyclerAdapter.displayLoading();
         mRecipeListViewModel.searchRecipeApi(category, 1);
     }
+
     @Override
     public void onBackPressed() {
-        if (mRecipeListViewModel.onBackPressed()){
+        if (mRecipeListViewModel.onBackPressed()) {
             super.onBackPressed();
-        }else
+        } else
             displaySearchCategories();
 
     }
