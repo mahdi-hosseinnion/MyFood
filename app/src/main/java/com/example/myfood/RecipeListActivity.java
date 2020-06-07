@@ -1,5 +1,7 @@
 package com.example.myfood;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -7,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.SearchView;
 
 
@@ -55,6 +59,8 @@ public class RecipeListActivity extends BasicActivity implements
     }
 
     private void init() {
+        //set support action bar for add menu to toolbar
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         mRecipeListViewModel = ViewModelProviders.of(this).get(RecipeListViewModel.class);
         initRecycler();
         initSearchView();
@@ -116,5 +122,19 @@ public class RecipeListActivity extends BasicActivity implements
         } else
             displaySearchCategories();
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //set menu to toolbar
+        getMenuInflater().inflate(R.menu.recipe_search_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId()==R.id.action_categories)
+            displaySearchCategories();
+        return super.onOptionsItemSelected(item);
     }
 }
