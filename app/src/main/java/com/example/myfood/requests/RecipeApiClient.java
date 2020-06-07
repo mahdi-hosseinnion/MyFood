@@ -82,7 +82,7 @@ public class RecipeApiClient {
                     } else {
                         List<Recipe> currentRecipes = mRecipes.getValue();
                         currentRecipes.addAll(list);
-                        mRecipes.postValue(list);
+                        mRecipes.postValue(currentRecipes);
                     }
                 } else {
                     Log.e(TAG, "run: " + response.errorBody());

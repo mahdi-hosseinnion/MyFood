@@ -23,6 +23,7 @@ public class RecipeRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private static final int LOADING_TYPE = 2;
     private static final int CATEGORY_TYPE = 3;
     private static final String LOADING = "LOADING...";
+    private static final String EXHASTED = "EXHASTED...";
     //var
     private List<Recipe> mRecipes;
     private OnRecipeListener onRecipeListener;
@@ -89,12 +90,17 @@ public class RecipeRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             return CATEGORY_TYPE;
         } else if (mRecipes.get(position).getTitle().equals(LOADING)) {
             return LOADING_TYPE;
+        } else if (position == (mRecipes.size() - 1)
+                && position !=0
+                && !mRecipes.get(position).getTitle().equals(EXHASTED)) {
+            return LOADING_TYPE;
         } else
             return RECIPE_TYPE;
     }
-    public void displaySearchCategories(){
+
+    public void displaySearchCategories() {
         List<Recipe> categories = new ArrayList<>();
-        for(int i = 0; i< Constants.DEFAULT_SEARCH_CATEGORIES.length; i++){
+        for (int i = 0; i < Constants.DEFAULT_SEARCH_CATEGORIES.length; i++) {
             Recipe recipe = new Recipe();
             recipe.setTitle(Constants.DEFAULT_SEARCH_CATEGORIES[i]);
             recipe.setImage_url(Constants.DEFAULT_SEARCH_CATEGORY_IMAGES[i]);
@@ -104,6 +110,7 @@ public class RecipeRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         mRecipes = categories;
         notifyDataSetChanged();
     }
+
     public void displayLoading() {
         if (!isLoading()) {
             Recipe recipe = new Recipe();

@@ -10,6 +10,8 @@ import androidx.lifecycle.LiveData;
 public class RecipeRepository {
     private static RecipeRepository instance;
     private RecipeApiClient RecipeApiClient;
+    private String mQuery;
+    private int mPageNumber;
 
     public static RecipeRepository getInstance() {
         if (instance == null) {
@@ -25,12 +27,20 @@ public class RecipeRepository {
     public LiveData<List<Recipe>> getRecipes() {
         return RecipeApiClient.getRecipes();
     }
-    public void searchRecipeApi(String query,int pageNO){
-        if (pageNO<1)
-            pageNO=1;
-        RecipeApiClient.searchRecipeApi(query,pageNO);
+
+    public void searchRecipeApi(String query, int pageNO) {
+        if (pageNO < 1)
+            pageNO = 1;
+        mQuery = query;
+        mPageNumber = pageNO;
+        RecipeApiClient.searchRecipeApi(query, pageNO);
     }
-    public void cancelRequest(){
+
+    public void searchNextPage() {
+        searchRecipeApi(mQuery, mPageNumber + 1);
+    }
+
+    public void cancelRequest() {
         RecipeApiClient.cancelRequest();
     }
 }

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 
 import com.example.myfood.Models.Recipe;
@@ -40,7 +41,7 @@ public class RecipeListActivity extends BasicActivity implements
         findViews();
         init();
         subscribeToLiveData();
-        Log.d(TAG, "onCreate: sssssssssssssssssssssstaaaaaaaaaaaaarted");
+
         if (!mRecipeListViewModel.isViewingRecipes()) {
             // display search categories
             displaySearchCategories();
@@ -71,6 +72,15 @@ public class RecipeListActivity extends BasicActivity implements
         mRecyclerView_recipe.addItemDecoration(new VerticalSpacingDecorator(30));
         mRecyclerView_recipe.setAdapter(mRecipeRecyclerAdapter);
         mRecyclerView_recipe.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView_recipe.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                if(!mRecyclerView_recipe.canScrollVertically(1)){
+                    mRecipeListViewModel.searchNextPage();
+                }
+
+            }
+        });
     }
 
     private void subscribeToLiveData() {
@@ -133,6 +143,7 @@ public class RecipeListActivity extends BasicActivity implements
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        //set onClick for menu
         if (item.getItemId()==R.id.action_categories)
             displaySearchCategories();
         return super.onOptionsItemSelected(item);
