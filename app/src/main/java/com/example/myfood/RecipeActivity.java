@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -22,6 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.myfood.Models.Recipe;
 import com.example.myfood.adapters.OnRecipeListener;
 import com.example.myfood.adapters.RecipeRecyclerAdapter;
@@ -36,7 +40,7 @@ public class RecipeActivity extends BasicActivity {
     //ui component
     private ImageView mRecipe_image;
     private TextView mRecipe_title, mRecipe_social_score;
-    private ScrollView parent;
+    private ScrollView mParent;
     private LinearLayout mRecipeIngredientsContainer;
     //var
     private RecipeViewModel mRecipeViewModel;
@@ -65,10 +69,12 @@ public class RecipeActivity extends BasicActivity {
         mRecipe_social_score = findViewById(R.id.recipe_social_score);
         mRecipe_image = findViewById(R.id.recipe_image);
         mRecipeIngredientsContainer = findViewById(R.id.ingredients_container);
+        mParent = findViewById(R.id.parent);
     }
 
     private void init() {
         mRecipeViewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
+        showProgressBar(true);
     }
 
     private void subscribeToRecipeLiveData() {
@@ -76,19 +82,35 @@ public class RecipeActivity extends BasicActivity {
             @Override
             public void onChanged(Recipe recipe) {
                 if (recipe != null) {
-                    Log.d(TAG, "onChanged: --------------------------");
-                    Log.d(TAG, "onChanged: " + recipe.toString());
+                    if (recipe.getRecipe_id().equals(mRecipeViewModel.getRecipeId()))
+                    setRecipeProperties(recipe);
                 }
             }
         });
-//        mRecipeViewModel.getRecipe().observe(this, new Observer<Recipe>() {
-//            @Override
-//            public void onChanged(Recipe recipe) {
-//                if (recipe!=null){
-//                Log.d(TAG, "onChanged: ------------------------------------------------------");
-//                Log.d(TAG, "onChanged: "+recipe.toString());}
-//            }
-//        });
 
+
+    }
+
+    private void setRecipeProperties(Recipe recipe) {
+        if (recipe != null) {
+            RequestOptions RQ=new RequestOptions().placeholder(R.drawable.ic_launcher_background);
+            Glide.with(this)
+                    .setDefaultRequestOptions(RQ)
+                    .load(recipe.getImage_url())
+                    .into(mRecipe_image);
+            mRecipe_title.setText(recipe.getTitle());
+            mRecipe_social_score.setText(String.valueOf(Math.round(recipe.getSocial_rank())));
+            mRecipeIngredientsContainer.removeAllViews();
+            for (String ingredient:recipe.getIngredients()){
+                TextView textView=new TextView(this);
+                textView.setText(ingredient);
+                textView.setTextSize(15);
+                textView.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+                mRecipeIngredientsContainer.addView(textView);
+            }
+            mParent.setVisibility(View.VISIBLE);
+            showProgressBar(false);
+        }
     }
 }
