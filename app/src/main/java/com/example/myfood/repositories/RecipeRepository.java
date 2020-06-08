@@ -9,7 +9,7 @@ import androidx.lifecycle.LiveData;
 
 public class RecipeRepository {
     private static RecipeRepository instance;
-    private RecipeApiClient RecipeApiClient;
+    private RecipeApiClient mRecipeApiClient;
     private String mQuery;
     private int mPageNumber;
 
@@ -21,11 +21,14 @@ public class RecipeRepository {
     }
 
     private RecipeRepository() {
-        RecipeApiClient = RecipeApiClient.getInstance();
+        mRecipeApiClient = mRecipeApiClient.getInstance();
     }
 
     public LiveData<List<Recipe>> getRecipes() {
-        return RecipeApiClient.getRecipes();
+        return mRecipeApiClient.getRecipes();
+    }
+    public LiveData<Recipe> getRecipe() {
+        return mRecipeApiClient.getRecipe();
     }
 
     public void searchRecipeApi(String query, int pageNO) {
@@ -33,14 +36,16 @@ public class RecipeRepository {
             pageNO = 1;
         mQuery = query;
         mPageNumber = pageNO;
-        RecipeApiClient.searchRecipeApi(query, pageNO);
+        mRecipeApiClient.searchRecipeApi(query, pageNO);
     }
-
+    public void searchRecipeById(String rId){
+        mRecipeApiClient.searchRecipeById(rId);
+    }
     public void searchNextPage() {
         searchRecipeApi(mQuery, mPageNumber + 1);
     }
 
     public void cancelRequest() {
-        RecipeApiClient.cancelRequest();
+        mRecipeApiClient.cancelRequest();
     }
 }

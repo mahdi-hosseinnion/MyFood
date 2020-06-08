@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.myfood.AppExecutors;
 import com.example.myfood.Models.Recipe;
+import com.example.myfood.requests.responses.RecipeResponse;
 import com.example.myfood.requests.responses.RecipeSearchResponse;
 import com.example.myfood.util.Constants;
 
@@ -23,6 +24,8 @@ public class RecipeApiClient {
     //var
     private static RecipeApiClient instance;
     private MutableLiveData<List<Recipe>> mRecipes;
+    private MutableLiveData<Recipe> mRecipe;
+    private RetrieveRecipesRunnable mRetrieveRecipesRunnable;
     private RetrieveRecipeRunnable mRetrieveRecipeRunnable;
 
     public static RecipeApiClient getInstance() {
@@ -33,16 +36,33 @@ public class RecipeApiClient {
 
     private RecipeApiClient() {
         mRecipes = new MutableLiveData<>();
+        mRecipe = new MutableLiveData<>();
     }
 
     public LiveData<List<Recipe>> getRecipes() {
         return mRecipes;
     }
+    public LiveData<Recipe> getRecipe() {
+        return mRecipe;
+    }
 
     public void searchRecipeApi(String query, int page) {
-        if (mRetrieveRecipeRunnable!=null)
-            mRetrieveRecipeRunnable=null;
-        mRetrieveRecipeRunnable=new RetrieveRecipeRunnable(query,page);
+        if (mRetrieveRecipesRunnable !=null)
+            mRetrieveRecipesRunnable =null;
+        mRetrieveRecipesRunnable =new RetrieveRecipesRunnable(query,page);
+        final Future handler = AppExecutors.getInstance().getNetWordIO().submit(mRetrieveRecipesRunnable);
+        AppExecutors.getInstance().getNetWordIO().schedule(new Runnable() {
+            @Override
+            public void run() {
+                //let user know its time out
+                handler.cancel(true);
+            }
+        }, Constants.TIME_OUT, TimeUnit.MILLISECONDS);
+    }
+    public void searchRecipeById(String recipeId) {
+        if (mRetrieveRecipeRunnable !=null)
+            mRetrieveRecipeRunnable =null;
+        mRetrieveRecipeRunnable =new RetrieveRecipeRunnable(recipeId);
         final Future handler = AppExecutors.getInstance().getNetWordIO().submit(mRetrieveRecipeRunnable);
         AppExecutors.getInstance().getNetWordIO().schedule(new Runnable() {
             @Override
@@ -53,12 +73,12 @@ public class RecipeApiClient {
         }, Constants.TIME_OUT, TimeUnit.MILLISECONDS);
     }
 
-    private class RetrieveRecipeRunnable implements Runnable {
+    private class RetrieveRecipesRunnable implements Runnable {
         private String query;
         private int pageNO;
         private boolean isCanceled;
 
-        public RetrieveRecipeRunnable(String query, int pageNO) {
+        public RetrieveRecipesRunnable(String query, int pageNO) {
             this.query = query;
             this.pageNO = pageNO;
             isCanceled = false;
@@ -106,8 +126,57 @@ public class RecipeApiClient {
             isCanceled = true;
         }
     }
+
+    private class RetrieveRecipeRunnable implements Runnable {
+        private String recipeId;
+
+        private boolean isCanceled;
+
+        public RetrieveRecipeRunnable(String recipeId) {
+            this.recipeId=recipeId;
+            isCanceled = false;
+        }
+
+        @Override
+        public void run() {
+
+            try {
+
+                Response response = getRecipe(recipeId).execute();
+
+                if (isCanceled) {
+                    return;
+                }
+                if (response.code() == 200) {
+                    Recipe recipe=((RecipeResponse)response.body()).getRecipe();
+                    mRecipe.postValue(recipe);
+                } else {
+                    Log.e(TAG, "run: " + response.errorBody());
+                    mRecipe.postValue(null);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                mRecipe.postValue(null);
+            }
+
+        }
+
+        private Call<RecipeResponse> getRecipe(String recipeId) {
+            return ServiceGenerator.getRecipeApi().getRecipe(
+                    recipeId
+            );
+        }
+
+        public void cancelRequest() {
+            isCanceled = true;
+        }
+    }
+
     public void cancelRequest(){
-        if (mRetrieveRecipeRunnable!=null){
+        if (mRetrieveRecipesRunnable !=null){
+            mRetrieveRecipesRunnable.cancelRequest();
+        }
+        if (mRetrieveRecipeRunnable !=null){
             mRetrieveRecipeRunnable.cancelRequest();
         }
     }
