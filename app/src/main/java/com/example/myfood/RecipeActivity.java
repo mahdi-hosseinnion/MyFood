@@ -1,6 +1,7 @@
 package com.example.myfood;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -11,6 +12,7 @@ import com.example.myfood.Models.Recipe;
 import androidx.annotation.Nullable;
 
 public class RecipeActivity extends BasicActivity {
+    private static final String TAG = "RecipeActivity";
     //ui component
     private ImageView mRecipe_image;
     private TextView mRecipe_title,mRecipe_social_score;
@@ -26,6 +28,7 @@ public class RecipeActivity extends BasicActivity {
     private void getIncomingIntent(){
         if (getIntent().hasExtra("recipe")){
             Recipe recipe = getIntent().getParcelableExtra("recipe");
+            Log.d(TAG, "getIncomingIntent: "+recipe.toString());
         }
     }
     private void findViews(){
