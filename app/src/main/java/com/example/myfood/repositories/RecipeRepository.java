@@ -27,8 +27,13 @@ public class RecipeRepository {
     public LiveData<List<Recipe>> getRecipes() {
         return mRecipeApiClient.getRecipes();
     }
+
     public LiveData<Recipe> getRecipe() {
         return mRecipeApiClient.getRecipe();
+    }
+
+    public LiveData<Boolean> isRecipeRequestTimeOut() {
+        return mRecipeApiClient.isRecipeRequestTimeOut();
     }
 
     public void searchRecipeApi(String query, int pageNO) {
@@ -38,9 +43,11 @@ public class RecipeRepository {
         mPageNumber = pageNO;
         mRecipeApiClient.searchRecipeApi(query, pageNO);
     }
-    public void searchRecipeById(String rId){
+
+    public void searchRecipeById(String rId) {
         mRecipeApiClient.searchRecipeById(rId);
     }
+
     public void searchNextPage() {
         searchRecipeApi(mQuery, mPageNumber + 1);
     }

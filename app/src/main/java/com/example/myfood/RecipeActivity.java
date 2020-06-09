@@ -1,39 +1,23 @@
 package com.example.myfood;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.myfood.Models.Recipe;
-import com.example.myfood.adapters.OnRecipeListener;
-import com.example.myfood.adapters.RecipeRecyclerAdapter;
-import com.example.myfood.util.VerticalSpacingDecorator;
-import com.example.myfood.viewmodels.RecipeListViewModel;
 import com.example.myfood.viewmodels.RecipeViewModel;
-
-import java.util.List;
 
 public class RecipeActivity extends BasicActivity {
     private static final String TAG = "RecipeActivity";
@@ -52,7 +36,7 @@ public class RecipeActivity extends BasicActivity {
         findViews();
         init();
         getIncomingIntent();
-        subscribeToRecipeLiveData();
+        subscribeToObservers();
 
     }
 
@@ -60,6 +44,8 @@ public class RecipeActivity extends BasicActivity {
         if (getIntent().hasExtra("recipe")) {
             Recipe recipe = getIntent().getParcelableExtra("recipe");
             mRecipeViewModel.searchRecipeById(recipe.getRecipe_id());
+            Log.d(TAG, "onChanged: timed start ");
+
         }
     }
 
@@ -77,17 +63,28 @@ public class RecipeActivity extends BasicActivity {
         showProgressBar(true);
     }
 
-    private void subscribeToRecipeLiveData() {
+    private void subscribeToObservers() {
         mRecipeViewModel.getRecipe().observe(this, new Observer<Recipe>() {
             @Override
             public void onChanged(Recipe recipe) {
                 if (recipe != null) {
-                    if (recipe.getRecipe_id().equals(mRecipeViewModel.getRecipeId()))
+                    if (recipe.getRecipe_id().equals(mRecipeViewModel.getRecipeId())){
                     setRecipeProperties(recipe);
+                    mRecipeViewModel.setDidRetrieveRecipe(true);
+                    }
                 }
             }
         });
+        mRecipeViewModel.isRecipeRequestTimeOut().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Log.d(TAG, "onChanged: timed aBoolean "+aBoolean.toString());
+                Log.d(TAG, "onChanged: timed didRetrieveRecipe "+(!mRecipeViewModel.didRetrieveRecipe()));
+                if (aBoolean && !mRecipeViewModel.didRetrieveRecipe()){
 
+                    Log.d(TAG, "onChanged: time out 30000/10");}
+            }
+        });
 
     }
 

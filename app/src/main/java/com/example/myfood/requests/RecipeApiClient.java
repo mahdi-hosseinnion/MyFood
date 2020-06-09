@@ -25,6 +25,8 @@ public class RecipeApiClient {
     private static RecipeApiClient instance;
     private MutableLiveData<List<Recipe>> mRecipes;
     private MutableLiveData<Recipe> mRecipe;
+    private MutableLiveData<Boolean> mRecipeRequestTimeOut;
+//    private MutableLiveData<Boolean> mRecipeRequestTimeOut= new MutableLiveData<>();
     private RetrieveRecipesRunnable mRetrieveRecipesRunnable;
     private RetrieveRecipeRunnable mRetrieveRecipeRunnable;
 
@@ -37,19 +39,24 @@ public class RecipeApiClient {
     private RecipeApiClient() {
         mRecipes = new MutableLiveData<>();
         mRecipe = new MutableLiveData<>();
+        mRecipeRequestTimeOut = new MutableLiveData<>();
     }
 
     public LiveData<List<Recipe>> getRecipes() {
         return mRecipes;
     }
+
     public LiveData<Recipe> getRecipe() {
         return mRecipe;
     }
+    public LiveData<Boolean> isRecipeRequestTimeOut() {
+        return mRecipeRequestTimeOut;
+    }
 
     public void searchRecipeApi(String query, int page) {
-        if (mRetrieveRecipesRunnable !=null)
-            mRetrieveRecipesRunnable =null;
-        mRetrieveRecipesRunnable =new RetrieveRecipesRunnable(query,page);
+        if (mRetrieveRecipesRunnable != null)
+            mRetrieveRecipesRunnable = null;
+        mRetrieveRecipesRunnable = new RetrieveRecipesRunnable(query, page);
         final Future handler = AppExecutors.getInstance().getNetWordIO().submit(mRetrieveRecipesRunnable);
         AppExecutors.getInstance().getNetWordIO().schedule(new Runnable() {
             @Override
@@ -59,15 +66,18 @@ public class RecipeApiClient {
             }
         }, Constants.TIME_OUT, TimeUnit.MILLISECONDS);
     }
+
     public void searchRecipeById(String recipeId) {
-        if (mRetrieveRecipeRunnable !=null)
-            mRetrieveRecipeRunnable =null;
-        mRetrieveRecipeRunnable =new RetrieveRecipeRunnable(recipeId);
+        mRecipeRequestTimeOut.setValue(false);
+        if (mRetrieveRecipeRunnable != null)
+            mRetrieveRecipeRunnable = null;
+        mRetrieveRecipeRunnable = new RetrieveRecipeRunnable(recipeId);
         final Future handler = AppExecutors.getInstance().getNetWordIO().submit(mRetrieveRecipeRunnable);
         AppExecutors.getInstance().getNetWordIO().schedule(new Runnable() {
             @Override
             public void run() {
-                //let user know its time out
+                Log.d(TAG, "run: time posted true");
+                mRecipeRequestTimeOut.postValue(true);
                 handler.cancel(true);
             }
         }, Constants.TIME_OUT, TimeUnit.MILLISECONDS);
@@ -133,7 +143,7 @@ public class RecipeApiClient {
         private boolean isCanceled;
 
         public RetrieveRecipeRunnable(String recipeId) {
-            this.recipeId=recipeId;
+            this.recipeId = recipeId;
             isCanceled = false;
         }
 
@@ -148,7 +158,7 @@ public class RecipeApiClient {
                     return;
                 }
                 if (response.code() == 200) {
-                    Recipe recipe=((RecipeResponse)response.body()).getRecipe();
+                    Recipe recipe = ((RecipeResponse) response.body()).getRecipe();
                     mRecipe.postValue(recipe);
                 } else {
                     Log.e(TAG, "run: " + response.errorBody());
@@ -172,11 +182,11 @@ public class RecipeApiClient {
         }
     }
 
-    public void cancelRequest(){
-        if (mRetrieveRecipesRunnable !=null){
+    public void cancelRequest() {
+        if (mRetrieveRecipesRunnable != null) {
             mRetrieveRecipesRunnable.cancelRequest();
         }
-        if (mRetrieveRecipeRunnable !=null){
+        if (mRetrieveRecipeRunnable != null) {
             mRetrieveRecipeRunnable.cancelRequest();
         }
     }
