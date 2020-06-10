@@ -68,9 +68,9 @@ public class RecipeActivity extends BasicActivity {
             @Override
             public void onChanged(Recipe recipe) {
                 if (recipe != null) {
-                    if (recipe.getRecipe_id().equals(mRecipeViewModel.getRecipeId())){
-                    setRecipeProperties(recipe);
-                    mRecipeViewModel.setDidRetrieveRecipe(true);
+                    if (recipe.getRecipe_id().equals(mRecipeViewModel.getRecipeId())) {
+                        setRecipeProperties(recipe);
+                        mRecipeViewModel.setDidRetrieveRecipe(true);
                     }
                 }
             }
@@ -78,11 +78,11 @@ public class RecipeActivity extends BasicActivity {
         mRecipeViewModel.isRecipeRequestTimeOut().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
-                Log.d(TAG, "onChanged: timed aBoolean "+aBoolean.toString());
-                Log.d(TAG, "onChanged: timed didRetrieveRecipe "+(!mRecipeViewModel.didRetrieveRecipe()));
-                if (aBoolean && !mRecipeViewModel.didRetrieveRecipe()){
-
-                    Log.d(TAG, "onChanged: time out 30000/10");}
+                Log.d(TAG, "onChanged: timed aBoolean " + aBoolean.toString());
+                Log.d(TAG, "onChanged: timed didRetrieveRecipe " + (!mRecipeViewModel.didRetrieveRecipe()));
+                if (aBoolean && !mRecipeViewModel.didRetrieveRecipe()) {
+                    displayErrorScreen("error retrieving data.Check network connection");
+                }
             }
         });
 
@@ -90,7 +90,7 @@ public class RecipeActivity extends BasicActivity {
 
     private void setRecipeProperties(Recipe recipe) {
         if (recipe != null) {
-            RequestOptions RQ=new RequestOptions().placeholder(R.drawable.ic_launcher_background);
+            RequestOptions RQ = new RequestOptions().placeholder(R.drawable.ic_launcher_background);
             Glide.with(this)
                     .setDefaultRequestOptions(RQ)
                     .load(recipe.getImage_url())
@@ -98,16 +98,39 @@ public class RecipeActivity extends BasicActivity {
             mRecipe_title.setText(recipe.getTitle());
             mRecipe_social_score.setText(String.valueOf(Math.round(recipe.getSocial_rank())));
             mRecipeIngredientsContainer.removeAllViews();
-            for (String ingredient:recipe.getIngredients()){
-                TextView textView=new TextView(this);
+            for (String ingredient : recipe.getIngredients()) {
+                TextView textView = new TextView(this);
                 textView.setText(ingredient);
                 textView.setTextSize(15);
                 textView.setLayoutParams(new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 mRecipeIngredientsContainer.addView(textView);
             }
             mParent.setVisibility(View.VISIBLE);
             showProgressBar(false);
         }
+    }
+
+    private void displayErrorScreen(String errorMessage) {
+        RequestOptions RQ = new RequestOptions().placeholder(R.drawable.ic_launcher_background);
+        Glide.with(this)
+                .setDefaultRequestOptions(RQ)
+                .load(R.drawable.ic_launcher_background)
+                .into(mRecipe_image);
+        mRecipe_title.setText("error reterieve data");
+        mRecipe_social_score.setText("");
+        mRecipeIngredientsContainer.removeAllViews();
+        TextView textView = new TextView(this);
+        if (!errorMessage.equals(""))
+        textView.setText(errorMessage);
+        else
+            textView.setText("Error");
+        textView.setTextSize(15);
+        textView.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mRecipeIngredientsContainer.addView(textView);
+
+        mParent.setVisibility(View.VISIBLE);
+        showProgressBar(false);
     }
 }

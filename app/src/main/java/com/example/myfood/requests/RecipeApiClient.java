@@ -68,11 +68,11 @@ public class RecipeApiClient {
     }
 
     public void searchRecipeById(String recipeId) {
-        mRecipeRequestTimeOut.setValue(false);
         if (mRetrieveRecipeRunnable != null)
             mRetrieveRecipeRunnable = null;
         mRetrieveRecipeRunnable = new RetrieveRecipeRunnable(recipeId);
         final Future handler = AppExecutors.getInstance().getNetWordIO().submit(mRetrieveRecipeRunnable);
+        mRecipeRequestTimeOut.setValue(false);
         AppExecutors.getInstance().getNetWordIO().schedule(new Runnable() {
             @Override
             public void run() {

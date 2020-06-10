@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 
 import com.example.myfood.Models.Recipe;
@@ -41,7 +40,7 @@ public class RecipeListActivity extends BasicActivity implements
         setContentView(R.layout.activity_recipe_list);
         findViews();
         init();
-        subscribeToLiveData();
+        subscribeObservers();
 
         if (!mRecipeListViewModel.isViewingRecipes()) {
             // display search categories
@@ -84,7 +83,7 @@ public class RecipeListActivity extends BasicActivity implements
         });
     }
 
-    private void subscribeToLiveData() {
+    private void subscribeObservers() {
         mRecipeListViewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
             @Override
             public void onChanged(List<Recipe> recipes) {
@@ -92,6 +91,12 @@ public class RecipeListActivity extends BasicActivity implements
                     mRecipeListViewModel.setIsPerformingQuery(false);
                     mRecipeRecyclerAdapter.setRecipes(recipes);
                 }
+            }
+        });
+        mRecipeListViewModel.isQueryExhausted().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean) Log.d(TAG, "onChanged: query is exhausted ....");
             }
         });
     }
