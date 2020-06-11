@@ -1,73 +1,36 @@
 package com.example.myfood.viewmodels;
 
+import android.app.Application;
+
 import com.example.myfood.Models.Recipe;
 import com.example.myfood.repositories.RecipeRepository;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.PluralsRes;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class RecipeListViewModel extends ViewModel {
-    private boolean mIsViewingRecipes;
-    private boolean mIsPerformingQuery;
-    private RecipeRepository mRecipesRepository;
+public class RecipeListViewModel extends AndroidViewModel {
+    public enum ViewState {CATEGORY, RECIPE}
+    private MutableLiveData <ViewState> viewState;
 
-    public RecipeListViewModel() {
-        mIsPerformingQuery = false;
-        mRecipesRepository = RecipeRepository.getInstance();
-    }
 
-    public LiveData<List<Recipe>> getRecipes() {
-        return mRecipesRepository.getRecipes();
+    public RecipeListViewModel(@NonNull Application application) {
+        super(application);
+        init();
     }
-
-    public LiveData<Boolean> isQueryExhausted() {
-        return mRecipesRepository.getIsQueryExhausted();
-    }
-    public void searchRecipeApi(String query, int pageNO) {
-        mIsViewingRecipes = true;
-        mIsPerformingQuery = true;
-        mRecipesRepository.searchRecipeApi(query, pageNO);
-    }
-    public void searchNextPage(){
-        if (!mIsPerformingQuery
-                &&mIsViewingRecipes
-                &&!isQueryExhausted().getValue()
-        ){
-            mRecipesRepository.searchNextPage();
+    private void init(){
+        if (viewState==null){
+            viewState=new MutableLiveData<>();
+            viewState.setValue(ViewState.CATEGORY);
         }
     }
 
-    public boolean onBackPressed() {
-        if (isPerformingQuery()) {
-            //cancel Request
-            mIsPerformingQuery=false;
-            mRecipesRepository.cancelRequest();
-        }
-        if (isViewingRecipes()) {
-            mIsViewingRecipes = false;
-            return false;
-        }
-        return true;
+    public MutableLiveData<ViewState> getViewState() {
+        return viewState;
     }
-
-
-    public boolean isPerformingQuery() {
-        return mIsPerformingQuery;
-    }
-
-    public void setIsPerformingQuery(boolean mIsPerformingQuery) {
-        this.mIsPerformingQuery = mIsPerformingQuery;
-    }
-
-    public boolean isViewingRecipes() {
-        return mIsViewingRecipes;
-    }
-
-    public void setIsViewingRecipes(boolean isViewingRecipes) {
-        mIsViewingRecipes = isViewingRecipes;
-    }
-
 }
