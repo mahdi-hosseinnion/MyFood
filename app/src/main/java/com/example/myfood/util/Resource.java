@@ -1,4 +1,4 @@
-package com.example.myfood.viewmodels;
+package com.example.myfood.util;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
