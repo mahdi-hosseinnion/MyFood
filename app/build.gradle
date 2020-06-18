@@ -12,6 +12,15 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation":"$projectDir/schemas".toString(),
+                        "room.incremental":"true",
+                        "room.expandProjection":"true"]
+            }
+        }
     }
 
     buildTypes {
@@ -27,6 +36,7 @@ dependencies {
     def retrofitVersion="2.6.0"
     def lifecycle_version = "2.2.0"
     def glide_version = "4.11.0"
+    def room_version = "2.2.5"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -55,6 +65,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.0-alpha06'
     //circle imageview
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    //room library
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 
 
 }
