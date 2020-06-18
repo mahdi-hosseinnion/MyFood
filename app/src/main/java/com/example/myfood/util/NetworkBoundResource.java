@@ -84,18 +84,24 @@ public abstract class NetworkBoundResource<CacheObject, RequestObject> {
                 if (requestObjectApiResponse instanceof ApiResponse.ApiSuccessResponse) {
                     Log.d(TAG, "onChanged: ApiSuccessResponse ");
                     //save the response to the local db
-                    saveCallResult((RequestObject) processResponse((ApiResponse.ApiSuccessResponse) requestObjectApiResponse));
-                    appExecutors.mainThreadExecutor().execute(new Runnable() {
+                    appExecutors.diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
-                            mResults.addSource(loadFromDb(), new Observer<CacheObject>() {
+                            saveCallResult((RequestObject) processResponse((ApiResponse.ApiSuccessResponse) requestObjectApiResponse));
+                            appExecutors.mainThreadExecutor().execute(new Runnable() {
                                 @Override
-                                public void onChanged(CacheObject cacheObject) {
-                                    setValue(Resource.success(cacheObject));
+                                public void run() {
+                                    mResults.addSource(loadFromDb(), new Observer<CacheObject>() {
+                                        @Override
+                                        public void onChanged(CacheObject cacheObject) {
+                                            setValue(Resource.success(cacheObject));
+                                        }
+                                    });
                                 }
                             });
                         }
                     });
+
 
                 } else if (requestObjectApiResponse instanceof ApiResponse.ApiEmptyResponse) {
                     Log.d(TAG, "onChanged: ApiEmptyResponse ");
