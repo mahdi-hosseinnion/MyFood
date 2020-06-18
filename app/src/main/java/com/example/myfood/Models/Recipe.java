@@ -6,26 +6,41 @@ import android.os.Parcelable;
 
 import java.util.Arrays;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "recipes")
 public class Recipe implements Parcelable {
     private String title;
     private String publisher;
+    @PrimaryKey(autoGenerate = true)
     private String recipe_id;
     private String image_url;
     private String[]  ingredients;
     private float  social_rank;
+    private int timeStamp;
 
     public Recipe() {
     }
-
-    public Recipe(String title, String publisher, String recipe_id,
-                  String image_url, String[] ingredients, float social_rank) {
+@Ignore
+    public Recipe(String title, String publisher, String recipe_id, String image_url, String[] ingredients, float social_rank, int timeStamp) {
         this.title = title;
         this.publisher = publisher;
         this.recipe_id = recipe_id;
         this.image_url = image_url;
         this.ingredients = ingredients;
         this.social_rank = social_rank;
-
+        this.timeStamp = timeStamp;
+    }
+    @Ignore
+    public Recipe(String title, String publisher, String image_url, String[] ingredients, float social_rank, int timeStamp) {
+        this.title = title;
+        this.publisher = publisher;
+        this.image_url = image_url;
+        this.ingredients = ingredients;
+        this.social_rank = social_rank;
+        this.timeStamp = timeStamp;
     }
 
     protected Recipe(Parcel in) {
@@ -35,6 +50,7 @@ public class Recipe implements Parcelable {
         image_url = in.readString();
         ingredients = in.createStringArray();
         social_rank = in.readFloat();
+        timeStamp = in.readInt();
     }
 
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
@@ -48,6 +64,22 @@ public class Recipe implements Parcelable {
             return new Recipe[size];
         }
     };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(publisher);
+        dest.writeString(recipe_id);
+        dest.writeString(image_url);
+        dest.writeStringArray(ingredients);
+        dest.writeFloat(social_rank);
+        dest.writeInt(timeStamp);
+    }
 
     public String getTitle() {
         return title;
@@ -97,19 +129,16 @@ public class Recipe implements Parcelable {
         this.social_rank = social_rank;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getTimeStamp() {
+        return timeStamp;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(title);
-        dest.writeString(publisher);
-        dest.writeString(recipe_id);
-        dest.writeString(image_url);
-        dest.writeStringArray(ingredients);
-        dest.writeFloat(social_rank);
+    public void setTimeStamp(int timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public static Creator<Recipe> getCREATOR() {
+        return CREATOR;
     }
 
     @Override
@@ -121,6 +150,7 @@ public class Recipe implements Parcelable {
                 ", image_url='" + image_url + '\'' +
                 ", ingredients=" + Arrays.toString(ingredients) +
                 ", social_rank=" + social_rank +
+                ", timeStamp=" + timeStamp +
                 '}';
     }
 }
