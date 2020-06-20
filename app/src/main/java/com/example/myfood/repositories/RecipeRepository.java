@@ -2,6 +2,7 @@ package com.example.myfood.repositories;
 
 import android.content.Context;
 import android.content.pm.ResolveInfo;
+import android.util.Log;
 
 import com.example.myfood.AppExecutors;
 import com.example.myfood.Models.Recipe;
@@ -24,6 +25,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 public class RecipeRepository {
+    private static final String TAG = "RecipeRepository";
     private static RecipeRepository instance;
     private RecipeDao recipeDao;
     public static RecipeRepository getInstance(Context context) {
@@ -41,7 +43,26 @@ public class RecipeRepository {
         return new NetworkBoundResource<List<Recipe>, RecipeSearchResponse>(AppExecutors.getInstance()){
             @Override
             protected void saveCallResult(@NonNull RecipeSearchResponse item) {
+                if (item.getRecipes()!=null){
+                    Recipe[] recipes=new Recipe[item.getRecipes().size()];
+                    int index=0;
+                    for (long rowId:recipeDao.insertRecipes((Recipe[])item.getRecipes().toArray(recipes))){
+                        if (rowId==-1){
+                            Log.d(TAG, "saveCallResult: conflict ... this recipe is already exists in the cache");
+                            //if the recipe already exist . i don't want to set the ingredients or timeStamp b/c
+                            //they will be erased.
+                            recipeDao.updateRecipe(
+                                    recipes[index].getRecipe_id(),
+                                    recipes[index].getTitle(),
+                                    recipes[index].getPublisher(),
+                                    recipes[index].getImage_url(),
+                                    recipes[index].getSocial_rank()
+                            );
 
+                        }
+                        index++;
+                    }
+                }
             }
 
             @Override
