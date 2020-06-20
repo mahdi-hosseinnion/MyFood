@@ -6,6 +6,7 @@ import android.os.Parcelable;
 
 import java.util.Arrays;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -14,7 +15,8 @@ import androidx.room.PrimaryKey;
 public class Recipe implements Parcelable {
     private String title;
     private String publisher;
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
+    @NonNull
     private String recipe_id;
     private String image_url;
     private String[]  ingredients;
