@@ -15,23 +15,23 @@ public class RecipeViewModel extends ViewModel {
     private boolean mDidRetrieveRecipe;
 
     public RecipeViewModel() {
-        mRecipeRepository=RecipeRepository.getInstance();
+        mRecipeRepository=RecipeRepository.getInstance(null);
         mDidRetrieveRecipe=false;
     }
-
-    public LiveData<Recipe> getRecipe(){
-        return mRecipeRepository.getRecipe();
-    }
-
-    public LiveData<Boolean> isRecipeRequestTimeOut() {
-        return mRecipeRepository.isRecipeRequestTimeOut();
-    }
-
-    public void searchRecipeById(String rId){
-
-        mRecipeRepository.searchRecipeById(rId);
-        mRecipeId=rId;
-    }
+//
+//    public LiveData<Recipe> getRecipe(){
+//        return mRecipeRepository.getRecipe();
+//    }
+//
+//    public LiveData<Boolean> isRecipeRequestTimeOut() {
+//        return mRecipeRepository.isRecipeRequestTimeOut();
+//    }
+//
+//    public void searchRecipeById(String rId){
+//
+//        mRecipeRepository.searchRecipeById(rId);
+//        mRecipeId=rId;
+//    }
 
     public String getRecipeId() {
         return mRecipeId;

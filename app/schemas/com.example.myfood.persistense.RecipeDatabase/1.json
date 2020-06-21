@@ -1,0 +1,70 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "63769f2a3dac5c26c95d60e137c8034c",
+    "entities": [
+      {
+        "tableName": "recipes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`title` TEXT, `publisher` TEXT, `recipe_id` TEXT NOT NULL, `image_url` TEXT, `ingredients` TEXT, `social_rank` REAL NOT NULL, `timeStamp` INTEGER NOT NULL, PRIMARY KEY(`recipe_id`))",
+        "fields": [
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "publisher",
+            "columnName": "publisher",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "recipe_id",
+            "columnName": "recipe_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "image_url",
+            "columnName": "image_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ingredients",
+            "columnName": "ingredients",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "social_rank",
+            "columnName": "social_rank",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timeStamp",
+            "columnName": "timeStamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "recipe_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '63769f2a3dac5c26c95d60e137c8034c')"
+    ]
+  }
+}

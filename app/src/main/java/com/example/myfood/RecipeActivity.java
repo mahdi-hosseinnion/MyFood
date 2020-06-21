@@ -43,7 +43,7 @@ public class RecipeActivity extends BasicActivity {
     private void getIncomingIntent() {
         if (getIntent().hasExtra("recipe")) {
             Recipe recipe = getIntent().getParcelableExtra("recipe");
-            mRecipeViewModel.searchRecipeById(recipe.getRecipe_id());
+//            mRecipeViewModel.searchRecipeById(recipe.getRecipe_id());
             Log.d(TAG, "onChanged: timed start ");
 
         }
@@ -64,27 +64,27 @@ public class RecipeActivity extends BasicActivity {
     }
 
     private void subscribeToObservers() {
-        mRecipeViewModel.getRecipe().observe(this, new Observer<Recipe>() {
-            @Override
-            public void onChanged(Recipe recipe) {
-                if (recipe != null) {
-                    if (recipe.getRecipe_id().equals(mRecipeViewModel.getRecipeId())) {
-                        setRecipeProperties(recipe);
-                        mRecipeViewModel.setDidRetrieveRecipe(true);
-                    }
-                }
-            }
-        });
-        mRecipeViewModel.isRecipeRequestTimeOut().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                Log.d(TAG, "onChanged: timed aBoolean " + aBoolean.toString());
-                Log.d(TAG, "onChanged: timed didRetrieveRecipe " + (!mRecipeViewModel.didRetrieveRecipe()));
-                if (aBoolean && !mRecipeViewModel.didRetrieveRecipe()) {
-                    displayErrorScreen("error retrieving data.Check network connection");
-                }
-            }
-        });
+//        mRecipeViewModel.getRecipe().observe(this, new Observer<Recipe>() {
+//            @Override
+//            public void onChanged(Recipe recipe) {
+//                if (recipe != null) {
+//                    if (recipe.getRecipe_id().equals(mRecipeViewModel.getRecipeId())) {
+//                        setRecipeProperties(recipe);
+//                        mRecipeViewModel.setDidRetrieveRecipe(true);
+//                    }
+//                }
+//            }
+//        });
+//        mRecipeViewModel.isRecipeRequestTimeOut().observe(this, new Observer<Boolean>() {
+//            @Override
+//            public void onChanged(Boolean aBoolean) {
+//                Log.d(TAG, "onChanged: timed aBoolean " + aBoolean.toString());
+//                Log.d(TAG, "onChanged: timed didRetrieveRecipe " + (!mRecipeViewModel.didRetrieveRecipe()));
+//                if (aBoolean && !mRecipeViewModel.didRetrieveRecipe()) {
+//                    displayErrorScreen("error retrieving data.Check network connection");
+//                }
+//            }
+//        });
 
     }
 

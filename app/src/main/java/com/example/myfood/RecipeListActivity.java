@@ -18,6 +18,7 @@ import android.widget.SearchView;
 import com.example.myfood.Models.Recipe;
 import com.example.myfood.adapters.OnRecipeListener;
 import com.example.myfood.adapters.RecipeRecyclerAdapter;
+import com.example.myfood.util.Resource;
 import com.example.myfood.util.VerticalSpacingDecorator;
 import com.example.myfood.viewmodels.RecipeListViewModel;
 
@@ -86,8 +87,8 @@ public class RecipeListActivity extends BasicActivity implements
         mRecipeListViewModel.getViewState().observe(this, new Observer<RecipeListViewModel.ViewState>() {
             @Override
             public void onChanged(RecipeListViewModel.ViewState viewState) {
-                if (viewState!=null)
-                    switch (viewState){
+                if (viewState != null)
+                    switch (viewState) {
                         case RECIPE:
                             break;
                         case CATEGORY:
@@ -96,6 +97,23 @@ public class RecipeListActivity extends BasicActivity implements
                     }
             }
         });
+        mRecipeListViewModel.getmRecipes().observe(this, new Observer<Resource<List<Recipe>>>() {
+            @Override
+            public void onChanged(Resource<List<Recipe>> listResource) {
+                if (listResource != null) {
+                    Log.d(TAG, "onChanged: status " + listResource.status);
+                    if (listResource.data != null) {
+                        for (Recipe recipe : listResource.data) {
+                            Log.d(TAG, "onChanged: -----" + recipe.getTitle());
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void searchRecipeApi(String query) {
+        mRecipeListViewModel.searchRecipeApi(query, 1);
     }
 
     private void initSearchView() {
@@ -104,7 +122,7 @@ public class RecipeListActivity extends BasicActivity implements
             public boolean onQueryTextSubmit(String query) {
                 mSearchView_main.clearFocus();
                 mRecipeRecyclerAdapter.displayLoading();
-//                mRecipeListViewModel.searchRecipeApi(query, 1);
+                searchRecipeApi(query);
                 return false;
             }
 
@@ -127,6 +145,7 @@ public class RecipeListActivity extends BasicActivity implements
     public void OnCategoryClick(String category) {
         mSearchView_main.clearFocus();
         mRecipeRecyclerAdapter.displayLoading();
+        searchRecipeApi(category);
 //        mRecipeListViewModel.searchRecipeApi(category, 1);
     }
 
