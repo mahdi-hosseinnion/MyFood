@@ -103,9 +103,7 @@ public class RecipeListActivity extends BasicActivity implements
                 if (listResource != null) {
                     Log.d(TAG, "onChanged: status " + listResource.status);
                     if (listResource.data != null) {
-                        for (Recipe recipe : listResource.data) {
-                            Log.d(TAG, "onChanged: -----" + recipe.getTitle());
-                        }
+                        mRecipeRecyclerAdapter.setRecipes(listResource.data);
                     }
                 }
             }
