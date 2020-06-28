@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,9 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.myfood.Models.Recipe;
 import com.example.myfood.adapters.OnRecipeListener;
 import com.example.myfood.adapters.RecipeRecyclerAdapter;
@@ -67,9 +71,14 @@ public class RecipeListActivity extends BasicActivity implements
         initRecycler();
         initSearchView();
     }
-
+    private RequestManager initGlide(){
+        RequestOptions requestOptions = new RequestOptions()
+                .placeholder(R.drawable.no_image)
+                .error(R.drawable.no_image);
+        return Glide.with(this).setDefaultRequestOptions(requestOptions);
+    }
     private void initRecycler() {
-        mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this);
+        mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this,initGlide());
         mRecyclerView_recipe.addItemDecoration(new VerticalSpacingDecorator(30));
         mRecyclerView_recipe.setAdapter(mRecipeRecyclerAdapter);
         mRecyclerView_recipe.setLayoutManager(new LinearLayoutManager(this));

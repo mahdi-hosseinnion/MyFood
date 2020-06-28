@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.myfood.Models.Recipe;
 import com.example.myfood.R;
@@ -28,9 +29,10 @@ public class RecipeRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     //var
     private List<Recipe> mRecipes;
     private OnRecipeListener onRecipeListener;
-
-    public RecipeRecyclerAdapter(OnRecipeListener onRecipeListener) {
+    private RequestManager mRequestManager;
+    public RecipeRecyclerAdapter(OnRecipeListener onRecipeListener, RequestManager requestManager) {
         this.onRecipeListener = onRecipeListener;
+        this.mRequestManager = requestManager;
     }
 
     @NonNull
@@ -47,11 +49,11 @@ public class RecipeRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 return new LoadingViewHolder(view);
             case CATEGORY_TYPE: {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_category_list_item, parent, false);
-                return new CategoryViewHolder(view, onRecipeListener);
+                return new CategoryViewHolder(view, onRecipeListener,mRequestManager);
             }
             default:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_recipe_list_item, parent, false);
-                return new RecipeViewHolder(view, onRecipeListener);
+                return new RecipeViewHolder(view, onRecipeListener,mRequestManager);
         }
 
     }
@@ -60,28 +62,9 @@ public class RecipeRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         int itemViewType = getItemViewType(position);
         if (itemViewType == RECIPE_TYPE) {
-            Recipe recipe = mRecipes.get(position);
-            ((RecipeViewHolder) holder).txt_title.setText(recipe.getTitle());
-            ((RecipeViewHolder) holder).txt_publisher.setText(recipe.getPublisher());
-            ((RecipeViewHolder) holder).txt_social_rank.setText(String.valueOf(Math.round(recipe.getSocial_rank())));
-            //setImage
-            RequestOptions RQ = new RequestOptions()
-                    .placeholder(R.drawable.ic_launcher_background);
-            Glide.with(holder.itemView.getContext())
-                    .setDefaultRequestOptions(RQ)
-                    .load(recipe.getImage_url())
-                    .into(((RecipeViewHolder) holder).recipe_image);
+            ((RecipeViewHolder)holder).onBind(mRecipes.get(position));
         } else if (itemViewType == CATEGORY_TYPE) {
-            RequestOptions options = new RequestOptions()
-                    .centerCrop()
-                    .placeholder(R.drawable.ic_launcher_background);
-            Uri path = Uri.parse("android.resource://com.example.myfood/drawable/" + mRecipes.get(position).getImage_url());
-            Glide.with(((CategoryViewHolder) holder).itemView)
-                    .setDefaultRequestOptions(options)
-                    .load(path)
-                    .into(((CategoryViewHolder) holder).img_category_image);
-
-            ((CategoryViewHolder) holder).txt_category_title.setText(mRecipes.get(position).getTitle());
+            ((CategoryViewHolder) holder).onBind(mRecipes.get(position));
         }
     }
 
