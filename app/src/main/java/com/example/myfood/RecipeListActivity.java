@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 
 import com.example.myfood.Models.Recipe;
@@ -97,13 +98,41 @@ public class RecipeListActivity extends BasicActivity implements
                     }
             }
         });
-        mRecipeListViewModel.getmRecipes().observe(this, new Observer<Resource<List<Recipe>>>() {
+        mRecipeListViewModel.getRecipes().observe(this, new Observer<Resource<List<Recipe>>>() {
             @Override
             public void onChanged(Resource<List<Recipe>> listResource) {
                 if (listResource != null) {
                     Log.d(TAG, "onChanged: status " + listResource.status);
                     if (listResource.data != null) {
-                        mRecipeRecyclerAdapter.setRecipes(listResource.data);
+                        switch (listResource.status) {
+                            case LOADING: {
+                                if (mRecipeListViewModel.getPageNumber() > 1) {
+                                    mRecipeRecyclerAdapter.displayLoading();
+                                } else {
+                                    mRecipeRecyclerAdapter.displayOnlyLoading();
+                                }
+                                break;
+                            }
+                            case ERROR: {
+                                Log.e(TAG, "onChanged: cannot refresh the cache");
+                                Log.e(TAG, "onChanged: ERROR msg " + listResource.message);
+                                Log.e(TAG, "onChanged: status : ERROR #Recipe " + listResource.data.size());
+                                mRecipeRecyclerAdapter.hideLoading();
+                                mRecipeRecyclerAdapter.setRecipes(listResource.data);
+                                Toast.makeText(RecipeListActivity.this, listResource.message, Toast.LENGTH_SHORT).show();
+                                if (listResource.message != null && listResource.message.equals("QUERY_EXHAUSTED BLA BLA BLA")) {
+                                    mRecipeRecyclerAdapter.displayQueryExhausted();
+                                }
+                                break;
+                            }
+                            case SUCCESS: {
+                                Log.d(TAG, "onChanged: cache has been refreshed.");
+                                Log.d(TAG, "onChanged: status : SUCCESS , #Recipe = " + listResource.data.size());
+                                mRecipeRecyclerAdapter.hideLoading();
+                                mRecipeRecyclerAdapter.setRecipes(listResource.data);
+                                break;
+                            }
+                        }
                     }
                 }
             }

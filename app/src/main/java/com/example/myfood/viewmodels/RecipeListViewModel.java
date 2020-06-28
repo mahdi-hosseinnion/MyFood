@@ -99,7 +99,11 @@ public class RecipeListViewModel extends AndroidViewModel {
 
     }
 
-    public LiveData<Resource<List<Recipe>>> getmRecipes() {
+    public LiveData<Resource<List<Recipe>>> getRecipes() {
         return mRecipes;
+    }
+
+    public int getPageNumber() {
+        return mPageNumber;
     }
 }
