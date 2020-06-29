@@ -109,7 +109,7 @@ public class RecipeRepository {
                     lastRefresh = data.getTimeStamp();
                 Log.d(TAG, "shouldFetch: current time = "+currentTime);
                 Log.d(TAG, "shouldFetch: last Refresh = "+lastRefresh);
-                Log.d(TAG, "shouldFetch: it's been "+((currentTime-lastRefresh)/60/60/24)+"days since last refresh");
+                Log.d(TAG, "shouldFetch: it's been "+((currentTime-lastRefresh)/60/60/24)+" days since last refresh");
                 if (currentTime - lastRefresh >= Constants.RECIPE_REFRESH_TIME) {
                     Log.d(TAG, "shouldFetch: true");
                     return true;

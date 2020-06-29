@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.myfood.Models.Recipe;
+import com.example.myfood.util.Resource;
 import com.example.myfood.viewmodels.RecipeViewModel;
 
 public class RecipeActivity extends BasicActivity {
@@ -36,14 +37,15 @@ public class RecipeActivity extends BasicActivity {
         findViews();
         init();
         getIncomingIntent();
-        subscribeToObservers();
+
 
     }
 
     private void getIncomingIntent() {
         if (getIntent().hasExtra("recipe")) {
             Recipe recipe = getIntent().getParcelableExtra("recipe");
-//            mRecipeViewModel.searchRecipeById(recipe.getRecipe_id());
+            if (recipe != null)
+                subscribeToObservers(recipe.getRecipe_id());
             Log.d(TAG, "onChanged: timed start ");
 
         }
@@ -63,29 +65,34 @@ public class RecipeActivity extends BasicActivity {
         showProgressBar(true);
     }
 
-    private void subscribeToObservers() {
-//        mRecipeViewModel.getRecipe().observe(this, new Observer<Recipe>() {
-//            @Override
-//            public void onChanged(Recipe recipe) {
-//                if (recipe != null) {
-//                    if (recipe.getRecipe_id().equals(mRecipeViewModel.getRecipeId())) {
-//                        setRecipeProperties(recipe);
-//                        mRecipeViewModel.setDidRetrieveRecipe(true);
-//                    }
-//                }
-//            }
-//        });
-//        mRecipeViewModel.isRecipeRequestTimeOut().observe(this, new Observer<Boolean>() {
-//            @Override
-//            public void onChanged(Boolean aBoolean) {
-//                Log.d(TAG, "onChanged: timed aBoolean " + aBoolean.toString());
-//                Log.d(TAG, "onChanged: timed didRetrieveRecipe " + (!mRecipeViewModel.didRetrieveRecipe()));
-//                if (aBoolean && !mRecipeViewModel.didRetrieveRecipe()) {
-//                    displayErrorScreen("error retrieving data.Check network connection");
-//                }
-//            }
-//        });
-
+    private void subscribeToObservers(final String recipeId) {
+        mRecipeViewModel.searchRecipeApi(recipeId).observe(this, new Observer<Resource<Recipe>>() {
+            @Override
+            public void onChanged(Resource<Recipe> recipeResource) {
+                    if (recipeResource!=null){
+                        if (recipeResource.data!=null){
+                            switch (recipeResource.status){
+                                case LOADING:{
+                                    showProgressBar(true);
+                                }
+                                case ERROR:{
+                                    Log.e(TAG, "onChanged: status: ERROR, Recipe: "+recipeResource.data.getTitle() );
+                                    Log.e(TAG, "onChanged: status: ERROR message: "+recipeResource.message );
+                                    showProgressBar(false);
+                                    mParent.setVisibility(View.VISIBLE);
+                                }
+                                case SUCCESS:{
+                                    Log.d(TAG, "onChanged: cache has been refreshed");
+                                    Log.d(TAG, "onChanged: status: SUCCESS, Recipe: "+recipeResource.data.getTitle());
+                                    showProgressBar(false);
+                                    mParent.setVisibility(View.VISIBLE);
+                                    
+                                }
+                            }
+                        }
+                    }
+            }
+        });
     }
 
     private void setRecipeProperties(Recipe recipe) {
@@ -122,7 +129,7 @@ public class RecipeActivity extends BasicActivity {
         mRecipeIngredientsContainer.removeAllViews();
         TextView textView = new TextView(this);
         if (!errorMessage.equals(""))
-        textView.setText(errorMessage);
+            textView.setText(errorMessage);
         else
             textView.setText("Error");
         textView.setTextSize(15);
