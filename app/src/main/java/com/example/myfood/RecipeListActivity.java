@@ -19,7 +19,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import com.example.myfood.Models.Recipe;
 import com.example.myfood.adapters.OnRecipeListener;
 import com.example.myfood.adapters.RecipeRecyclerAdapter;
@@ -80,10 +82,18 @@ public class RecipeListActivity extends BasicActivity implements
     }
 
     private void initRecycler() {
-        mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this, initGlide());
+        ViewPreloadSizeProvider<String> viewPreload=new ViewPreloadSizeProvider<>();
+        mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this, initGlide(),viewPreload);
+        RecyclerViewPreloader<String> preloader=new RecyclerViewPreloader<String>(
+                Glide.with(this),
+                mRecipeRecyclerAdapter,
+                viewPreload,
+                30);
+        mRecyclerView_recipe.addOnScrollListener(preloader);
         mRecyclerView_recipe.addItemDecoration(new VerticalSpacingDecorator(30));
         mRecyclerView_recipe.setAdapter(mRecipeRecyclerAdapter);
         mRecyclerView_recipe.setLayoutManager(new LinearLayoutManager(this));
+        //for search next page
         mRecyclerView_recipe.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {

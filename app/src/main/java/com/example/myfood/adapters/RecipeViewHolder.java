@@ -7,6 +7,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import com.example.myfood.Models.Recipe;
 import com.example.myfood.R;
 
@@ -18,8 +19,8 @@ public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.On
     ImageView recipe_image;
     private OnRecipeListener onRecipeListener;
     private RequestManager mRequestManager;
-
-    public RecipeViewHolder(@NonNull View itemView, OnRecipeListener onRecipeListener,RequestManager requestManager) {
+    public ViewPreloadSizeProvider mViewPreloadSizeProvider;
+    public RecipeViewHolder(@NonNull View itemView, OnRecipeListener onRecipeListener,RequestManager requestManager,ViewPreloadSizeProvider viewPreloadSizeProvider) {
 
         super(itemView);
         txt_title = itemView.findViewById(R.id.recipe_title);
@@ -28,6 +29,7 @@ public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.On
         recipe_image = itemView.findViewById(R.id.recipe_image);
         this.onRecipeListener = onRecipeListener;
         this.mRequestManager=requestManager;
+        this.mViewPreloadSizeProvider=viewPreloadSizeProvider;
         itemView.setOnClickListener(this);
     }
 
@@ -39,6 +41,7 @@ public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.On
         //setImage
         mRequestManager.load(recipe.getImage_url())
                 .into(recipe_image);
+        mViewPreloadSizeProvider.setView(recipe_image);
     }
 
     @Override
