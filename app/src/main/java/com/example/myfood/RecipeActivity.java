@@ -69,28 +69,29 @@ public class RecipeActivity extends BasicActivity {
         mRecipeViewModel.searchRecipeApi(recipeId).observe(this, new Observer<Resource<Recipe>>() {
             @Override
             public void onChanged(Resource<Recipe> recipeResource) {
-                    if (recipeResource!=null){
-                        if (recipeResource.data!=null){
-                            switch (recipeResource.status){
-                                case LOADING:{
-                                    showProgressBar(true);
-                                }
-                                case ERROR:{
-                                    Log.e(TAG, "onChanged: status: ERROR, Recipe: "+recipeResource.data.getTitle() );
-                                    Log.e(TAG, "onChanged: status: ERROR message: "+recipeResource.message );
-                                    showProgressBar(false);
-                                    mParent.setVisibility(View.VISIBLE);
-                                }
-                                case SUCCESS:{
-                                    Log.d(TAG, "onChanged: cache has been refreshed");
-                                    Log.d(TAG, "onChanged: status: SUCCESS, Recipe: "+recipeResource.data.getTitle());
-                                    showProgressBar(false);
-                                    mParent.setVisibility(View.VISIBLE);
-                                    
-                                }
+                if (recipeResource != null) {
+                    if (recipeResource.data != null) {
+                        switch (recipeResource.status) {
+                            case LOADING: {
+                                showProgressBar(true);
+                            }
+                            case ERROR: {
+                                Log.e(TAG, "onChanged: status: ERROR, Recipe: " + recipeResource.data.getTitle());
+                                Log.e(TAG, "onChanged: status: ERROR message: " + recipeResource.message);
+                                showProgressBar(false);
+                                mParent.setVisibility(View.VISIBLE);
+                                setRecipeProperties(recipeResource.data);
+                            }
+                            case SUCCESS: {
+                                Log.d(TAG, "onChanged: cache has been refreshed");
+                                Log.d(TAG, "onChanged: status: SUCCESS, Recipe: " + recipeResource.data.getTitle());
+                                showProgressBar(false);
+                                mParent.setVisibility(View.VISIBLE);
+                                setRecipeProperties(recipeResource.data);
                             }
                         }
                     }
+                }
             }
         });
     }
@@ -104,6 +105,12 @@ public class RecipeActivity extends BasicActivity {
                     .into(mRecipe_image);
             mRecipe_title.setText(recipe.getTitle());
             mRecipe_social_score.setText(String.valueOf(Math.round(recipe.getSocial_rank())));
+            setIngredients(recipe);
+        }
+    }
+
+    private void setIngredients(Recipe recipe) {
+        if (recipe.getIngredients() != null) {
             mRecipeIngredientsContainer.removeAllViews();
             for (String ingredient : recipe.getIngredients()) {
                 TextView textView = new TextView(this);
@@ -113,9 +120,16 @@ public class RecipeActivity extends BasicActivity {
                         ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 mRecipeIngredientsContainer.addView(textView);
             }
-            mParent.setVisibility(View.VISIBLE);
-            showProgressBar(false);
+        } else {
+            mRecipeIngredientsContainer.removeAllViews();
+            TextView textView = new TextView(this);
+            textView.setText("Error retrieving ingredients \n Check network connection");
+            textView.setTextSize(15);
+            textView.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            mRecipeIngredientsContainer.addView(textView);
         }
+
     }
 
     private void displayErrorScreen(String errorMessage) {
