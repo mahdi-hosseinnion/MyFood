@@ -71,24 +71,27 @@ public class RecipeListActivity extends BasicActivity implements
         initRecycler();
         initSearchView();
     }
-    private RequestManager initGlide(){
+
+    private RequestManager initGlide() {
         RequestOptions requestOptions = new RequestOptions()
                 .placeholder(R.drawable.no_image)
                 .error(R.drawable.no_image);
         return Glide.with(this).setDefaultRequestOptions(requestOptions);
     }
+
     private void initRecycler() {
-        mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this,initGlide());
+        mRecipeRecyclerAdapter = new RecipeRecyclerAdapter(this, initGlide());
         mRecyclerView_recipe.addItemDecoration(new VerticalSpacingDecorator(30));
         mRecyclerView_recipe.setAdapter(mRecipeRecyclerAdapter);
         mRecyclerView_recipe.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView_recipe.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-//                if (!mRecyclerView_recipe.canScrollVertically(1)) {
-//                    mRecipeListViewModel.searchNextPage();
-//                }
-
+                super.onScrollStateChanged(recyclerView, newState);
+                if (!mRecyclerView_recipe.canScrollVertically(1)
+                        && mRecipeListViewModel.getViewState().getValue() == RecipeListViewModel.ViewState.RECIPE) {
+                    mRecipeListViewModel.searchNextPage();
+                }
             }
         });
     }
@@ -149,7 +152,9 @@ public class RecipeListActivity extends BasicActivity implements
     }
 
     private void searchRecipeApi(String query) {
+        mRecyclerView_recipe.smoothScrollToPosition(0);
         mRecipeListViewModel.searchRecipeApi(query, 1);
+        mSearchView_main.clearFocus();
     }
 
     private void initSearchView() {

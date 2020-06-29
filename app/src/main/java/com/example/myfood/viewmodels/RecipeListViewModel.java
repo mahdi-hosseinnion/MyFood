@@ -48,7 +48,12 @@ public class RecipeListViewModel extends AndroidViewModel {
     public MutableLiveData<ViewState> getViewState() {
         return viewState;
     }
-
+    public void searchNextPage(){
+        if (!mIsPerformingQuery&&!mIsQueryExhausted){
+            mPageNumber++;
+            executeSearch();
+        }
+    }
     public void searchRecipeApi(String query, int pageNumber) {
         if (!mIsPerformingQuery) {
             if (pageNumber == 0)
@@ -56,15 +61,15 @@ public class RecipeListViewModel extends AndroidViewModel {
             this.mPageNumber = pageNumber;
             this.mQuery = query;
             mIsQueryExhausted = false;
-            executeSearch(pageNumber, query);
+            executeSearch();
         }
 
     }
 
-    private void executeSearch(int pageNumber, String query) {
+    private void executeSearch() {
         mIsPerformingQuery = true;
         viewState.setValue(ViewState.RECIPE);
-        final LiveData<Resource<List<Recipe>>> repositorySource = mRecipeRepository.searchRecipeApi(query, pageNumber);
+        final LiveData<Resource<List<Recipe>>> repositorySource = mRecipeRepository.searchRecipeApi(mQuery, mPageNumber);
         mRecipes.addSource(repositorySource, new Observer<Resource<List<Recipe>>>() {
             @Override
             public void onChanged(Resource<List<Recipe>> listResource) {
