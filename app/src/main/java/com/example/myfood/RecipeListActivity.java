@@ -90,6 +90,8 @@ public class RecipeListActivity extends BasicActivity implements
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!mRecyclerView_recipe.canScrollVertically(1)
                         && mRecipeListViewModel.getViewState().getValue() == RecipeListViewModel.ViewState.RECIPE) {
+                    //TODO i thing you should add loading (adapter loading in here)
+//                    mRecipeRecyclerAdapter.displayLoading();
                     mRecipeListViewModel.searchNextPage();
                 }
             }
@@ -192,10 +194,11 @@ public class RecipeListActivity extends BasicActivity implements
 
     @Override
     public void onBackPressed() {
-//        if (mRecipeListViewModel.onBackPressed()) {
-//            super.onBackPressed();
-//        } else
-//            displaySearchCategories();
+        if (mRecipeListViewModel.getViewState().getValue()== RecipeListViewModel.ViewState.CATEGORY){
+            super.onBackPressed();
+        }else{
+            mRecipeListViewModel.setViewCategory();
+        }
 
     }
 

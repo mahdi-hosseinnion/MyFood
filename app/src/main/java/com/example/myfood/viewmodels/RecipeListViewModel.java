@@ -111,4 +111,7 @@ public class RecipeListViewModel extends AndroidViewModel {
     public int getPageNumber() {
         return mPageNumber;
     }
+    public void setViewCategory(){
+        viewState.setValue(ViewState.CATEGORY);
+    }
 }
