@@ -9,6 +9,7 @@ public class Constants {
     public static final int CONNECTION_TIMEOUT=10;//10 SECOND
     public static final int READ_TIMEOUT=2;//1 SECOND
     public static final int WRITE_TIMEOUT=2;//1 SECOND
+    public static final int RECIPE_REFRESH_TIME=60*60*24*30;//convert 30 days to second
     public static final String[] DEFAULT_SEARCH_CATEGORY_IMAGES =
             {
                     "barbeque",
