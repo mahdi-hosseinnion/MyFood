@@ -26,11 +26,13 @@ public class RecipeListViewModel extends AndroidViewModel {
     private MutableLiveData<ViewState> viewState;
     private MediatorLiveData<Resource<List<Recipe>>> mRecipes = new MediatorLiveData<>();
     private RecipeRepository mRecipeRepository;
+
     //improving the query
     private boolean mIsQueryExhausted;
     private boolean mIsPerformingQuery;
     private int mPageNumber;
     private String mQuery;
+    private boolean mCancelRequest;
 
     public RecipeListViewModel(@NonNull Application application) {
         super(application);
@@ -48,12 +50,14 @@ public class RecipeListViewModel extends AndroidViewModel {
     public MutableLiveData<ViewState> getViewState() {
         return viewState;
     }
-    public void searchNextPage(){
-        if (!mIsPerformingQuery&&!mIsQueryExhausted){
+
+    public void searchNextPage() {
+        if (!mIsPerformingQuery && !mIsQueryExhausted) {
             mPageNumber++;
             executeSearch();
         }
     }
+
     public void searchRecipeApi(String query, int pageNumber) {
         if (!mIsPerformingQuery) {
             if (pageNumber == 0)
@@ -68,37 +72,42 @@ public class RecipeListViewModel extends AndroidViewModel {
 
     private void executeSearch() {
         mIsPerformingQuery = true;
+        mCancelRequest = false;
         viewState.setValue(ViewState.RECIPE);
         final LiveData<Resource<List<Recipe>>> repositorySource = mRecipeRepository.searchRecipeApi(mQuery, mPageNumber);
         mRecipes.addSource(repositorySource, new Observer<Resource<List<Recipe>>>() {
             @Override
             public void onChanged(Resource<List<Recipe>> listResource) {
-                if (listResource != null) {
-                    mRecipes.setValue(listResource);
-                    if (listResource.status == Resource.Status.SUCCESS) {
-                        mIsPerformingQuery = false;
-                        if (listResource.data != null) {
-                            //TODO i think this if should be -> if (listResource.data.size()/30!=0){
-                            if (listResource.data.size() == 0) {
-                                Log.d(TAG, "onChanged: query is exhausted");
-                                mRecipes.setValue(
-                                        new Resource<List<Recipe>>(
-                                                Resource.Status.ERROR,
-                                                listResource.data,
-                                                QUERY_EXHAUSTED
-                                        )
-                                );
+                if (!mCancelRequest){
+                    if (listResource != null) {
+                        mRecipes.setValue(listResource);
+                        if (listResource.status == Resource.Status.SUCCESS) {
+                            mIsPerformingQuery = false;
+                            if (listResource.data != null) {
+                                //TODO i think this if should be -> if (listResource.data.size()/30!=0){
+                                if (listResource.data.size() == 0) {
+                                    Log.d(TAG, "onChanged: query is exhausted");
+                                    mRecipes.setValue(
+                                            new Resource<List<Recipe>>(
+                                                    Resource.Status.ERROR,
+                                                    listResource.data,
+                                                    QUERY_EXHAUSTED
+                                            )
+                                    );
 
+                                }
                             }
+                            mRecipes.removeSource(repositorySource);
+                        } else if (listResource.status == Resource.Status.ERROR) {
+                            mIsPerformingQuery = false;
+                            mRecipes.removeSource(repositorySource);
                         }
-                        mRecipes.removeSource(repositorySource);
-                    } else if (listResource.status == Resource.Status.ERROR) {
-                        mIsPerformingQuery = false;
+                    } else {
                         mRecipes.removeSource(repositorySource);
                     }
-                } else {
+                }else
                     mRecipes.removeSource(repositorySource);
-                }
+
             }
         });
 
@@ -111,7 +120,17 @@ public class RecipeListViewModel extends AndroidViewModel {
     public int getPageNumber() {
         return mPageNumber;
     }
-    public void setViewCategory(){
+
+    public void setViewCategory() {
         viewState.setValue(ViewState.CATEGORY);
+    }
+
+    public void cancelSearchRequest() {
+        if (mIsPerformingQuery) {
+            Log.d(TAG, "cancelSearchRequest: cancel Request");
+            mCancelRequest = true;
+            mIsPerformingQuery=false;
+            mPageNumber=1;
+        }
     }
 }

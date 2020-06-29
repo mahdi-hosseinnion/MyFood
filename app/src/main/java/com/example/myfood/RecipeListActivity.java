@@ -197,6 +197,7 @@ public class RecipeListActivity extends BasicActivity implements
         if (mRecipeListViewModel.getViewState().getValue()== RecipeListViewModel.ViewState.CATEGORY){
             super.onBackPressed();
         }else{
+            mRecipeListViewModel.cancelSearchRequest();
             mRecipeListViewModel.setViewCategory();
         }
 

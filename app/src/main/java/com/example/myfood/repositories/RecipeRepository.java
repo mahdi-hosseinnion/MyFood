@@ -48,7 +48,6 @@ public class RecipeRepository {
                     int index=0;
                     for (long rowId:recipeDao.insertRecipes((Recipe[])item.getRecipes().toArray(recipes))){
                         if (rowId==-1){
-                            Log.d(TAG, "saveCallResult: conflict ... this recipe is already exists in the cache");
                             //if the recipe already exist . i don't want to set the ingredients or timeStamp b/c
                             //they will be erased.
                             recipeDao.updateRecipe(
